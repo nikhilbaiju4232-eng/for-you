@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Surprise for You</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: radial-gradient(circle, #fff0f3 0%, #ffccd5 100%);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        #start-screen {
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; cursor: pointer; text-align: center;
+            z-index: 1000; position: fixed; width: 100%;
+            background: radial-gradient(circle, #fff0f3 0%, #ffccd5 100%);
+            transition: opacity 0.8s ease;
+        }
+
+        .main-heart {
+            font-size: 100px;
+            animation: beat 1.2s infinite;
+            filter: drop-shadow(0 0 15px rgba(255, 77, 109, 0.6));
+        }
+
+        @keyframes beat {
+            0%, 60%, 100% { transform: scale(1); }
+            15% { transform: scale(1.3); }
+            30% { transform: scale(1.1); }
+        }
+
+        /* Photo Styles - Sized for your Asus TUF Screen */
+        .photo {
+            position: absolute;
+            width: 260px; 
+            padding: 10px;
+            background: white;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+        }
+
+        .photo img {
+            width: 100%; border-radius: 4px; display: block;
+        }
+
+        /* Position anchors to prevent overlap */
+        #p1 { top: 5%; left: 5%; }             /* Top Left */
+        #p2 { top: 5%; right: 5%; }            /* Top Right */
+        #p3 { bottom: 10%; left: 5%; }         /* Bottom Left */
+        #p4 { top: 2%; left: 50%; transform: translateX(-50%) scale(0); } /* Top Middle */
+        #p5 { bottom: 10%; right: 5%; }        /* Bottom Right */
+
+        #next-hint {
+            position: fixed; bottom: 30px; width: 100%;
+            text-align: center; color: #ff4d6d;
+            font-weight: bold; opacity: 0;
+            transition: opacity 1s; z-index: 20;
+            pointer-events: none;
+        }
+
+        #final-message {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 40px; border-radius: 40px;
+            text-align: center; width: 80%; max-width: 450px;
+            opacity: 0; z-index: 100;
+            border: 3px solid #ff4d6d;
+            box-shadow: 0 25px 60px rgba(255, 77, 109, 0.4);
+            display: none;
+            transition: all 0.8s ease;
+        }
+
+        h2 {
+            font-family: 'Dancing Script', cursive;
+            color: #ff4d6d; font-size: 2.5rem; margin-bottom: 15px;
+        }
+
+        .heart-particle {
+            position: absolute; color: #ff4d6d;
+            pointer-events: none; z-index: 5;
+            animation: float-up 4s linear forwards;
+        }
+
+        @keyframes float-up {
+            to { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body onclick="handleGlobalClick()">
+
+    <div id="start-screen">
+        <div>
+            <div class="main-heart">❤️</div>
+            <p style="color: #ff4d6d; font-weight: bold; letter-spacing: 3px; margin-top: 20px;">CLICK TO START</p>
+        </div>
+    </div>
+
+    <div class="photo" id="p1"><img src="photo1.jpeg"></div>
+    <div class="photo" id="p2"><img src="photo2.jpeg"></div>
+    <div class="photo" id="p3"><img src="photo3.jpeg"></div>
+    <div class="photo" id="p4"><img src="photo4.jpeg"></div>
+    <div class="photo" id="p5"><img src="photo5.jpeg"></div>
+
+    <div id="next-hint">Beautiful memories... Click again ❤️</div>
+
+    <div id="final-message">
+        <h2>A Message for You</h2>
+        <p style="font-size: 1.1rem; line-height: 1.6;">
+            Every moment we spend together becomes my favorite memory. 
+            I'm so lucky to have you. You make everything brighter 
+            just by being you!
+        </p>
+        <div style="font-size: 40px; margin-top: 10px;">❤️</div>
+    </div>
+
+    <script>
+        let stage = 0;
+
+        function handleGlobalClick() {
+            if (stage === 0) startSurprise();
+            else if (stage === 1) showMessage();
+        }
+
+        function startSurprise() {
+            const start = document.getElementById('start-screen');
+            start.style.opacity = '0';
+            setTimeout(() => start.style.display = 'none', 800);
+
+            // Start the heart rain
+            setInterval(createHeart, 200);
+
+            const photos = document.querySelectorAll('.photo');
+            photos.forEach((photo, index) => {
+                setTimeout(() => {
+                    photo.style.opacity = '1';
+                    const randomRot = (Math.random() * 10) - 5; // Subtle rotation
+                    
+                    if(photo.id === 'p4') {
+                        photo.style.transform = `translateX(-50%) scale(1) rotate(${randomRot}deg)`;
+                    } else {
+                        photo.style.transform = `scale(1) rotate(${randomRot}deg)`;
+                    }
+                    
+                    if (index === photos.length - 1) {
+                        setTimeout(() => {
+                            document.getElementById('next-hint').style.opacity = '1';
+                            stage = 1;
+                        }, 1200);
+                    }
+                }, index * 500);
+            });
+        }
+
+        function showMessage() {
+            const msg = document.getElementById('final-message');
+            document.getElementById('next-hint').style.opacity = '0';
+            msg.style.display = 'block';
+            setTimeout(() => {
+                msg.style.opacity = '1';
+                msg.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 50);
+            setInterval(createHeart, 80); // Speed up hearts
+            stage = 2;
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart-particle';
+            const hearts = ['❤️', '💖', '💘', '💝', '💕'];
+            heart.innerHTML = hearts[Math.floor(Math.random() * hearts.length)];
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.top = '105vh';
+            heart.style.fontSize = (Math.random() * 30 + 15) + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 4000);
+        }
+    </script>
+</body>
+</html>
